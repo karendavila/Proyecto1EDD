@@ -7,6 +7,7 @@ package proyecto1davilaaldana;
 
 import grafo.Grafo;
 import grafo.Cola;
+import grafo.Modify;
 import grafo.Pila;
 import grafo.Search;
 import java.io.File;
@@ -17,9 +18,14 @@ import javax.swing.JOptionPane;
 
 
 public class Ventana extends javax.swing.JFrame {
+    private String path; 
     private int usersQuant;
     private Integer[][] matrix; 
     private int[] usuariosArray;
+    private boolean loadedFile; 
+    private String usersGuide; 
+    private String relsGuide;
+    private boolean searchMade;
     
 
     /**
@@ -36,11 +42,15 @@ public class Ventana extends javax.swing.JFrame {
         
     }
     
+    
+    
+    
     private String getPath(){
         JFileChooser selector = new JFileChooser(); 
         selector.showOpenDialog(null); 
         File f = selector.getSelectedFile(); 
         String path = f.getAbsolutePath();
+        System.out.println(path);
         return path;
     }
     
@@ -58,7 +68,7 @@ public class Ventana extends javax.swing.JFrame {
      * @author Darío Aldana
      */
    
-    private void initGrafo(String path) {
+    private boolean initGrafo(String path) {
         try{
             File file = new File(path);
             Scanner sc = new Scanner(file);
@@ -83,17 +93,28 @@ public class Ventana extends javax.swing.JFrame {
             
             
             matrix = this.grafo.createGrafo(sbUser.toString(), sbEdge.toString(), counter);
+            this.usersGuide = sbUser.toString();
+            this.relsGuide = sbEdge.toString();
             
             String[] lineUsers = sbUser.toString().split("//");
             usersQuant =  lineUsers.length;
             usuariosArray = Grafo.createUsersArray(lineUsers);
             // usuariosArray es un arreglo con sólo los ID de los usuarios
-
+            return true; 
 
         }catch(FileNotFoundException ex){
-            //debe informar que el archivo no existe
+            JOptionPane.showMessageDialog(null, 
+                    "El archivo no existe o no se encuentra en la ruta especificada",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE); 
+            
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null, 
+                    "Error al leer el archivo",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE); 
         }
-
+        return false;
     }
     
     
@@ -111,8 +132,16 @@ public class Ventana extends javax.swing.JFrame {
         loadFile = new javax.swing.JButton();
         islandsQuant = new javax.swing.JButton();
         bridgesFinder = new javax.swing.JButton();
+        modifyGraph = new javax.swing.JButton();
+        bienvenida = new javax.swing.JLabel();
+        firstInstruction = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        title1 = new javax.swing.JLabel();
+        title2 = new javax.swing.JLabel();
+        fondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 255, 255));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         loadFile.setText("Cargar Archivo");
@@ -121,15 +150,15 @@ public class Ventana extends javax.swing.JFrame {
                 loadFileActionPerformed(evt);
             }
         });
-        getContentPane().add(loadFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, -1, -1));
+        getContentPane().add(loadFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 140, -1, -1));
 
-        islandsQuant.setText("Cantidad de Islas");
+        islandsQuant.setText("Determinar Cantidad de Islas");
         islandsQuant.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 islandsQuantActionPerformed(evt);
             }
         });
-        getContentPane().add(islandsQuant, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 180, -1, -1));
+        getContentPane().add(islandsQuant, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, -1, -1));
 
         bridgesFinder.setText("Identificar Puentes");
         bridgesFinder.addActionListener(new java.awt.event.ActionListener() {
@@ -137,7 +166,42 @@ public class Ventana extends javax.swing.JFrame {
                 bridgesFinderActionPerformed(evt);
             }
         });
-        getContentPane().add(bridgesFinder, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 260, -1, -1));
+        getContentPane().add(bridgesFinder, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 300, -1, -1));
+
+        modifyGraph.setText("Modificar Grafo");
+        modifyGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                modifyGraphActionPerformed(evt);
+            }
+        });
+        getContentPane().add(modifyGraph, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 300, -1, -1));
+
+        bienvenida.setFont(new java.awt.Font("Bahnschrift", 0, 14)); // NOI18N
+        bienvenida.setText("Bienvenido al evaluador de amistades por excelencia");
+        getContentPane().add(bienvenida, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 70, 360, -1));
+
+        firstInstruction.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        firstInstruction.setText("<html>Primero que todo, indique el archivo de <P> <html> donde se extraerá la data para realizar el grafo.<P>");
+        firstInstruction.setToolTipText("");
+        firstInstruction.setFocusable(false);
+        firstInstruction.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(firstInstruction, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, 320, 40));
+
+        jLabel1.setText("Posteriormente, seleccione la función a realizar: ");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, -1, -1));
+
+        title1.setFont(new java.awt.Font("Arial Black", 2, 36)); // NOI18N
+        title1.setText("APP    ");
+        getContentPane().add(title1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 10, 130, -1));
+
+        title2.setFont(new java.awt.Font("Bahnschrift", 1, 48)); // NOI18N
+        title2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        title2.setText("mistad");
+        getContentPane().add(title2, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 10, 160, 60));
+
+        fondo.setBackground(new java.awt.Color(255, 255, 255));
+        fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/background.jpg"))); // NOI18N
+        getContentPane().add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 530, 420));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -146,7 +210,8 @@ public class Ventana extends javax.swing.JFrame {
         // TODO add your handling code here:
         String path; 
         path = getPath(); 
-        initGrafo(path); 
+        this.path = path; 
+        loadedFile = initGrafo(path); 
         
         
     }//GEN-LAST:event_loadFileActionPerformed
@@ -154,53 +219,94 @@ public class Ventana extends javax.swing.JFrame {
     private void islandsQuantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_islandsQuantActionPerformed
         // TODO add your handling code here:
         
-        System.out.println(usersQuant);
-        //usersQuant = initGrafo(path); 
-        
-        int selection = JOptionPane.showOptionDialog(null, 
-                "Indique método de preferencia", 
-                "Tipo de Recorrido", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.QUESTION_MESSAGE, 
-                null, 
-                new Object[] {"BFS", "DFS"},
-                null);
-        
-        if (selection != -1){
-            if (selection == 0){
-                System.out.println(selection);
+        if (loadedFile){
+            int selection = JOptionPane.showOptionDialog(null, 
+                    "Indique método de preferencia", 
+                    "Tipo de Recorrido", 
+                    JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, 
+                    null, 
+                    new Object[] {"BFS", "DFS"},
+                    null);
 
-                  Cola queue = new Cola();
-                  queue.BFS(usuariosArray, matrix, true);
+            if (selection != -1){
+                if (selection == 0){
+                    System.out.println(selection);
+
+                      Cola queue = new Cola();
+                      queue.BFS(usuariosArray, matrix, true);
+
+                    //ejecuta BFS
+                } else if (selection == 1){
+                     System.out.println(selection);
+                     Pila pila = new Pila(); 
+                     pila.DFS(usuariosArray, matrix);
+
+                }
                 
-                //ejecuta BFS
-            } else if (selection == 1){
-                 System.out.println(selection);
-                 Pila pila = new Pila(); 
-                 pila.DFS(usuariosArray, matrix);
-     
+                this.searchMade = true; 
             }
+            
+            
+        }else{
+            JOptionPane.showMessageDialog(null, 
+                    "Debe cargar el archivo primero",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        Search s = new Search();
-        //int islandCounter = s.getIslandCounter(); 
-        
 
     }//GEN-LAST:event_islandsQuantActionPerformed
 
     private void bridgesFinderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bridgesFinderActionPerformed
         // TODO add your handling code here:
-        Grafo g = new Grafo(usersQuant);
-        String[] bridges = g.findBridges(usersQuant, matrix, usuariosArray);
         
-        
-        for (int i = 0; i < bridges.length; i++) {
-            JOptionPane.showMessageDialog(null, 
-                    bridges[i], 
-                    "Identificador de Puentes", 
+        if (loadedFile){ 
+            if (searchMade){
+                
+                Grafo g = new Grafo(usersQuant);
+                String[] bridges = g.findBridges(usersQuant, matrix, usuariosArray);
+
+                JOptionPane.showMessageDialog(null,
+                        "Se ha encontrado " + bridges.length/2 +
+                                " puente(s).");
+                for (int i = 0; i < bridges.length/2; i++) {
+                    JOptionPane.showMessageDialog(null, 
+                        "Puente N° " + (i+1) + ":\n" + 
+                                "Entre los nodos:   " + bridges[i], 
+                        "Identificador de Puentes", 
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
+                
+            } else {
+                JOptionPane.showMessageDialog(null, 
+                    "Cantidad inicial de islas sin determinar:\nDetermine la cantidad de Islas",
+                    "Falta de Exploración Inicial",
                     JOptionPane.INFORMATION_MESSAGE);
+            }
+        }else{
+            
+            JOptionPane.showMessageDialog(null, 
+                    "Debe cargar el archivo primero",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
-        
     }//GEN-LAST:event_bridgesFinderActionPerformed
+
+    private void modifyGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modifyGraphActionPerformed
+        // TODO add your handling code here:
+        
+        usersGuide = getUsersGuide();
+        
+        if (loadedFile){   
+            Modify m = new Modify(usuariosArray, usersGuide, relsGuide, path);
+
+        } else {
+            JOptionPane.showMessageDialog(null, 
+                    "Debe cargar el archivo primero",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_modifyGraphActionPerformed
 
     /**
      * @param args the command line arguments
@@ -238,10 +344,22 @@ public class Ventana extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel bienvenida;
     private javax.swing.JButton bridgesFinder;
+    private javax.swing.JLabel firstInstruction;
+    private javax.swing.JLabel fondo;
     private javax.swing.JButton islandsQuant;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JButton loadFile;
+    private javax.swing.JButton modifyGraph;
+    private javax.swing.JLabel title1;
+    private javax.swing.JLabel title2;
     // End of variables declaration//GEN-END:variables
     private Grafo grafo;
+    
+    public String getUsersGuide() {
+        return this.usersGuide;
+    }
+    
 }

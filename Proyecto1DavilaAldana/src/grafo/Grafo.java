@@ -21,6 +21,8 @@ public class Grafo {
     private Lista<Usuario> usuarios;
     private int[] usuariosArray;
     private int size; 
+    private String usersGuide; 
+    
 
 
     
@@ -40,7 +42,20 @@ public class Grafo {
     }
     
     
-    /**
+    public static int[] createUsersArray(String[] lineUsers){
+        int[] usuariosArray = new int[lineUsers.length];
+        
+        for (int i = 0; i < lineUsers.length; i++) {
+
+            String[] datos = lineUsers[i].split(",");
+            usuariosArray[i] = Integer.parseInt(datos[0].trim());
+
+        }
+        
+        return usuariosArray;
+    }
+    
+        /**
      * createGrafo recibe los mega Strings de 
      * usuarios y sus relaciones, los divide en 
      * arreglos de strings y después itera sobre ellos 
@@ -59,29 +74,14 @@ public class Grafo {
      * @author Karen Davila
      */
     
-    
-    public static int[] createUsersArray(String[] lineUsers){
-        int[] usuariosArray = new int[lineUsers.length];
-        
-        for (int i = 0; i < lineUsers.length; i++) {
-
-            String[] datos = lineUsers[i].split(",");
-            usuariosArray[i] = Integer.parseInt(datos[0].trim());
-
-        }
-        
-        return usuariosArray;
-    }
-    
-    
     public Integer[][] createGrafo(String usuariosStr, String aristas, int size){
 
           String[] lineUsers = usuariosStr.split("//");
           String[] lineEdge = aristas.split("//");
-          
+
           usuariosArray = createUsersArray(lineUsers);
-          
-          
+
+
           for (int i = 0; i < lineUsers.length; i++) {
 
               String[] datos = lineUsers[i].split(",");
@@ -89,21 +89,21 @@ public class Grafo {
               this.usuarios.insertar(usuario);
 
           }
-          
+
           for (int i = 0; i < lineEdge.length; i++) {
-              
+
             String[] datos= lineEdge[i].split(",");
-            
+
             Usuario userX = new Usuario(Integer.parseInt(datos[0].trim()),"");
             Usuario userY = new Usuario(Integer.parseInt(datos[1].trim()),"");
-            
+
 
             //Busca la posición para determinar
             //si existe arista o no
             int posX = this.usuarios.buscarPosicion(userX);
             int posY = this.usuarios.buscarPosicion(userY);
-            
-            
+
+
 
             this.matrix[posX][posY]= Integer.parseInt(datos[2].trim());
         }
@@ -146,16 +146,13 @@ public class Grafo {
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
         Graph graph = new SingleGraph("Graph"); 
         
-        
-        
+
         for (int i = 0; i < usuariosArray.length; i++) {
-            
             graph.addNode(Integer.toString(usuariosArray[i]));  
             Node n = graph.getNode(Integer.toString(usuariosArray[i]));
             n.setAttribute("ui.style", "shape:circle;fill-color: rgb(154, 220, 255);size: 35px; text-alignment: center;");
             n.setAttribute("ui.label", Integer.toString(usuariosArray[i]));          
-           
-            
+   
         }
         System.out.println("...\n out ff \n\n");
         for (int i = 0; i < size; i++) {
@@ -167,27 +164,17 @@ public class Grafo {
                             Integer.toString(usuariosArray[j]));
                     
                     Edge g = graph.getEdge(Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]));
-                    g.setAttribute("ui.label", Integer.toString(weight));
-                    //g.setAttribute("ui.style", "text-alignment: left"); 
-                    
+                    g.setAttribute("ui.label", Integer.toString(weight));  
                 }
             }
-            
         }
         
         Viewer viewer = graph.display(); 
-        viewer.enableAutoLayout();
-        
-        
-        
+        viewer.enableAutoLayout(); 
     }
     
     public String[] findBridges(int usersQuant, Integer[][] matrix, int[] usuariosArray){
-        
-        System.setProperty("org.graphstream.ui", "swing"); 
-        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-        Graph graph = new SingleGraph("Graph"); 
-        
+
         int size = usersQuant;
        
         int initialIslands = Search.islandQuant;
@@ -204,35 +191,23 @@ public class Grafo {
         
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                
-                System.out.println("firstchecking");
-                
+
                 if (matrix[i][j] != null){
-                    System.out.println("checking");
+                    
+                    finalIslands = initialIslands; 
+                    
                     int weight = matrix[i][j];
                     
+                    matrix[i][j] = null; 
+                    matrix[j][i] = null; 
                     
-                    System.out.println(weight);
-                    
-                    Edge e = graph.getEdge(Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]));
-                    
-                    graph.removeEdge(e);
-                    
-                  
-                    
-//                    Node n = graph.getNode(Integer.toString(usuariosArray[i]));
-//                    Node m = graph.getNode(Integer.toString(usuariosArray[j]));
-//                    graph.removeEdge(n, m);
-
-//                    graph.removeEdge(Integer.toString(usuariosArray[i]),
-//                            Integer.toString(usuariosArray[j]));
-                    
-
-                    System.out.println("LESGO");
                     q.BFS(usuariosArray, matrix, false);
+                    
                     finalIslands = Search.islandQuant;
+                 
                     
                     if (finalIslands != initialIslands){
+                        
                         if (sb.toString().equals("")){
                             sb.append(Integer.toString(usuariosArray[i]) + "-");
                             sb.append(Integer.toString(usuariosArray[j]));
@@ -243,34 +218,16 @@ public class Grafo {
                         }
                     }
                     
-                    Node n = graph.getNode(Integer.toString(usuariosArray[i]));
-                    Node m = graph.getNode(Integer.toString(usuariosArray[j]));
-                    graph.addEdge(Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]), n, m);
-                    
-//                    String id = (Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]));
-//                    System.out.println(id);
-//                    String n = Integer.toString(usuariosArray[i]);
-//                    String m = Integer.toString(usuariosArray[j]);
-//
-//                    graph.addEdge(id, n, m);
-//
-//                    graph.addEdge(Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]), 
-//                            Integer.toString(usuariosArray[i]), 
-//                            Integer.toString(usuariosArray[j]));
+                    matrix[i][j] = weight; 
+                    matrix[j][i] = weight; 
 
-
-//                    graph.addEdge(Integer.toString(usuariosArray[i])+Integer.toString(usuariosArray[j]), 
-//                            Integer.toString(usuariosArray[i])), 
-//                            Integer.toString(usuariosArray[j]));
                 }
             }
-            
         }
         
         String[] bridges = sb.toString().split("//");
         return bridges; 
     }
     
-
-
 }
+

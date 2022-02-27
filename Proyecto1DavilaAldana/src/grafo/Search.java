@@ -219,7 +219,7 @@ public class Search {
     
     public static int islandSetter(int islandCounter){
         islandQuant = islandCounter; 
-        System.out.println("Probando "+ islandQuant);
+        System.out.println("Probando IQ "+ islandQuant);
         return islandQuant; 
     }
     
