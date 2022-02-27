@@ -16,7 +16,16 @@ public class Lista<T> {
         this.first = null;
         this.last = null;
     }
-            
+    
+    /**
+     * insertar permite ir creando la lista, 
+     * recibe un valor y enlaza los nodos
+     * 
+     * @param value: valor a guardar en el nodo, 
+     * es un usuario y su ID
+     * 
+     * @author Karen Davila
+     */
     public void insertar(T value){
         Nodo<T> newNodo = new Nodo<>(value);
         if(this.first == null ){
@@ -29,12 +38,25 @@ public class Lista<T> {
         this.count++;
     }
     
+    
+    /**
+     * buscarPosicion devuelve la localización del
+     * nodo en la lista, aplica para ambas coordenadas
+     * (x y y), devuelve el índice de lo que se 
+     * busca para ir creando la matriz 
+     * 
+     * @param value: valor del nodo
+     * 
+     * @return index: indice del nodo en el arreglo
+     */
     public int buscarPosicion(T value){
+        
         int index = 0;
         
         Nodo<T> aux  = this.first;
+       
         while(aux != null){
-            if(aux.equals(value)){
+            if(aux.getValue().equals(value)){
                 return index;            
             }
             aux = aux.getNext();
@@ -42,5 +64,5 @@ public class Lista<T> {
         }
         return -1;
     }
-    
+//        
 }
