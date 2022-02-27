@@ -6,30 +6,65 @@
 package proyecto1davilaaldana;
 
 import grafo.Grafo;
+import grafo.Cola;
+import grafo.Pila;
+import grafo.Search;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 
 public class Ventana extends javax.swing.JFrame {
+    private int usersQuant;
+    private Integer[][] matrix; 
+    private int[] usuariosArray;
+    
 
     /**
      * Creates new form Ventana
      */
     public Ventana() {
         initComponents();
+        setSize(525, 420);
+        this.setLocationRelativeTo(null); 
+        this.setVisible(true);
+        this.setResizable(false);
         
-        initGrafo("C:\\Users\\jedar\\Documents\\info.txt"); 
+        
+        
+    }
+    
+    private String getPath(){
+        JFileChooser selector = new JFileChooser(); 
+        selector.showOpenDialog(null); 
+        File f = selector.getSelectedFile(); 
+        String path = f.getAbsolutePath();
+        return path;
     }
     
     
+    /**
+     * initGrafo lee el txt y ejecuta Grafo para 
+     * crear la matriz de adyacencia y luego
+     * createGrafo enviándole dos Strings, 
+     * uno de los usuarios con su ID y
+     * otro de las relaciones. 
+     * // es el separador entre lineas
+     * 
+     * @param path: ruta del txt
+     * 
+     * @author Darío Aldana
+     */
+   
     private void initGrafo(String path) {
         try{
             File file = new File(path);
             Scanner sc = new Scanner(file);
             StringBuilder sbUser = new StringBuilder();
             StringBuilder sbEdge = new StringBuilder();
-            int count = 0;
+            int counter = 0;
             sc.nextLine();
             while(sc.hasNext()){
                 String line = sc.nextLine();
@@ -37,20 +72,31 @@ public class Ventana extends javax.swing.JFrame {
                     break;
                 sbUser.append(line);
                 sbUser.append("//");
-                count++;
+                counter++;
             }
             while(sc.hasNext()){
                 sbEdge.append(sc.nextLine());
                 sbEdge.append("//");
             }
-            this.grafo = new Grafo(count);
-            this.grafo.createGrafo(sbUser.toString(), sbEdge.toString());
             
+            this.grafo = new Grafo(counter);
+            
+            
+            matrix = this.grafo.createGrafo(sbUser.toString(), sbEdge.toString(), counter);
+            
+            String[] lineUsers = sbUser.toString().split("//");
+            usersQuant =  lineUsers.length;
+            usuariosArray = Grafo.createUsersArray(lineUsers);
+            // usuariosArray es un arreglo con sólo los ID de los usuarios
+
+
         }catch(FileNotFoundException ex){
             //debe informar que el archivo no existe
         }
-                
+
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -61,21 +107,100 @@ public class Ventana extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jFileChooser1 = new javax.swing.JFileChooser();
+        loadFile = new javax.swing.JButton();
+        islandsQuant = new javax.swing.JButton();
+        bridgesFinder = new javax.swing.JButton();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        loadFile.setText("Cargar Archivo");
+        loadFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadFileActionPerformed(evt);
+            }
+        });
+        getContentPane().add(loadFile, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 110, -1, -1));
+
+        islandsQuant.setText("Cantidad de Islas");
+        islandsQuant.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                islandsQuantActionPerformed(evt);
+            }
+        });
+        getContentPane().add(islandsQuant, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 180, -1, -1));
+
+        bridgesFinder.setText("Identificar Puentes");
+        bridgesFinder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bridgesFinderActionPerformed(evt);
+            }
+        });
+        getContentPane().add(bridgesFinder, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 260, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void loadFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadFileActionPerformed
+        // TODO add your handling code here:
+        String path; 
+        path = getPath(); 
+        initGrafo(path); 
+        
+        
+    }//GEN-LAST:event_loadFileActionPerformed
+
+    private void islandsQuantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_islandsQuantActionPerformed
+        // TODO add your handling code here:
+        
+        System.out.println(usersQuant);
+        //usersQuant = initGrafo(path); 
+        
+        int selection = JOptionPane.showOptionDialog(null, 
+                "Indique método de preferencia", 
+                "Tipo de Recorrido", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                new Object[] {"BFS", "DFS"},
+                null);
+        
+        if (selection != -1){
+            if (selection == 0){
+                System.out.println(selection);
+
+                  Cola queue = new Cola();
+                  queue.BFS(usuariosArray, matrix, true);
+                
+                //ejecuta BFS
+            } else if (selection == 1){
+                 System.out.println(selection);
+                 Pila pila = new Pila(); 
+                 pila.DFS(usuariosArray, matrix);
+     
+            }
+        }
+        Search s = new Search();
+        //int islandCounter = s.getIslandCounter(); 
+        
+
+    }//GEN-LAST:event_islandsQuantActionPerformed
+
+    private void bridgesFinderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bridgesFinderActionPerformed
+        // TODO add your handling code here:
+        Grafo g = new Grafo(usersQuant);
+        String[] bridges = g.findBridges(usersQuant, matrix, usuariosArray);
+        
+        
+        for (int i = 0; i < bridges.length; i++) {
+            JOptionPane.showMessageDialog(null, 
+                    bridges[i], 
+                    "Identificador de Puentes", 
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_bridgesFinderActionPerformed
 
     /**
      * @param args the command line arguments
@@ -113,6 +238,10 @@ public class Ventana extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bridgesFinder;
+    private javax.swing.JButton islandsQuant;
+    private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JButton loadFile;
     // End of variables declaration//GEN-END:variables
     private Grafo grafo;
 }
