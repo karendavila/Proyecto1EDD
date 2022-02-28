@@ -16,16 +16,19 @@ import java.util.Scanner;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
-
+/**
+ * 
+ * @author dario
+ */
 public class Ventana extends javax.swing.JFrame {
     private String path; 
     private int usersQuant;
     private Integer[][] matrix; 
     private int[] usuariosArray;
-    private boolean loadedFile; 
-    private String usersGuide; 
-    private String relsGuide;
-    private boolean searchMade;
+    private boolean loadedFile; //boolean si el archivo fue cargado
+    private String usersGuide; //string del apartado de usuarios del txt
+    private String relsGuide; //string del apartado de relaciones del txt
+    private boolean searchMade; // si se realizó un primer recorrido del grafo
     
 
     /**
@@ -37,20 +40,24 @@ public class Ventana extends javax.swing.JFrame {
         this.setLocationRelativeTo(null); 
         this.setVisible(true);
         this.setResizable(false);
-        
-        
-        
+  
     }
     
-    
-    
-    
+    /**
+     * Description: getPath es la que ejecuta el 
+     * JFileChooser para determinar la ruta del 
+     * archivo txt que funcionarpa como base de
+     * datos 
+     * 
+     * @author Darío Aldana
+     * 
+     * @return path: string con la ruta
+     */
     private String getPath(){
         JFileChooser selector = new JFileChooser(); 
         selector.showOpenDialog(null); 
         File f = selector.getSelectedFile(); 
         String path = f.getAbsolutePath();
-        System.out.println(path);
         return path;
     }
     
@@ -66,6 +73,10 @@ public class Ventana extends javax.swing.JFrame {
      * @param path: ruta del txt
      * 
      * @author Darío Aldana
+     * 
+     * @return retorna un boolean, true si sí se 
+     *      ejecutó la clase Grafo y false si hubo algún
+     *      problema con la lectura del archivo. 
      */
    
     private boolean initGrafo(String path) {
@@ -99,7 +110,11 @@ public class Ventana extends javax.swing.JFrame {
             String[] lineUsers = sbUser.toString().split("//");
             usersQuant =  lineUsers.length;
             usuariosArray = Grafo.createUsersArray(lineUsers);
-            // usuariosArray es un arreglo con sólo los ID de los usuarios
+
+            /** usuariosArray es un arreglo de enteros 
+             * con sólo los ID de los usuarios
+            */
+            
             return true; 
 
         }catch(FileNotFoundException ex){
@@ -279,7 +294,7 @@ public class Ventana extends javax.swing.JFrame {
                 
             } else {
                 JOptionPane.showMessageDialog(null, 
-                    "Cantidad inicial de islas sin determinar:\nDetermine la cantidad de Islas",
+                    "Cantidad inicial de islas sin determinar:\nDetermine la cantidad de Islas Antes de Proceder con la Identificación de Puentes",
                     "Falta de Exploración Inicial",
                     JOptionPane.INFORMATION_MESSAGE);
             }
