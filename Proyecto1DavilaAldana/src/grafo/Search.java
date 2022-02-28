@@ -12,18 +12,51 @@ import javax.swing.JOptionPane;
  * @author dario
  */
 public class Search {
-//    private Nodo first; 
-//    private Nodo last; 
+
     private int size; 
     private Nodo n; 
     public static int islandQuant;
 
-    
+    /**
+     * La clase Search tiene el algoritmo que hace
+     * los recorridos, sean de anchura o de profundidad. 
+     */
     public Search(){
         
 
     }
     
+    
+    /**
+     * Description: es la función que realiza los recorridos, sea por
+     *          anchura o por profundidad. A lo largo de la función 
+     *          se divergen acciones según el valor del boolean BFS, pues
+     *          tal disyuntiva define si es por colas(BFS) o por pilas(DFS).
+     *          Tiene dos ciclos while, el más general para determinar
+     *          cuando fueron evaluados todos los nodos y otro para iterar
+     *          recorriendo toda la isla seleccionada. Se usa un arreglo
+     *          de booleanos para determinar qué IDs (nodos) ya fueron 
+     *          examinados. 
+     *          Al final, según el valor del param "print" imprime las colas 
+     *          mediante JOptionPane, habiendo creado anteriormente un 
+     *          StringBuilder. 
+     * 
+     * 
+     * @param usuariosArray array de enteros con el ID de los usuarios
+     * 
+     * @param matrix es la matriz de adyacencia,
+     *      un arreglo en dos dimensiones x y y
+     * 
+     * 
+     * @param BFS booleano que indica si el recorrido será por
+     *          anchura (BFS) o por profundidad (DFS), si es true
+     *          es por BFS y si es false por DFS
+     * 
+     * @param print booleano que indica si el recorrido debe ser
+     *           mostrado en pantalla; básicamente, es true si 
+     *           se está determinando la cantidad de islas y es false
+     *           si se están identificando los puentes. 
+     */
     public void SearchFinal(int[] usuariosArray, 
             Integer[][] matrix, 
             boolean BFS, 
@@ -43,14 +76,23 @@ public class Search {
         int nodeCounter = 0; // cuenta los nodos
         boolean separador = false; //define si usamos "--" en el StringBuilder
         
+        
+        /**
+         * A lo largo de la función hay varios 
+         * de estos condicionales, sirven para poder
+         * reutilizar el código y aplicarlo para colas
+         * y pilas también. 
+         */
         if (BFS) {
-                    size = cola.size();
+                    size = cola.size(); 
                 } else {
                     size = pila.size();
                 }
         
         
         boolean[] checked = new boolean[usersQuant];
+        //array de booleanos que indica si un nodo 
+        //fue evaluado o no mediante los índices de estos
         
         for (int i = 0; i < usersQuant; i++) {
             checked[i] = false;
@@ -70,11 +112,11 @@ public class Search {
                         n = new Nodo(usuariosArray[i]);
                         
 
-                        if (BFS){
+                        if (BFS){ //si es BFS usamos colas
                             cola.queue(n);
                             size++;
                         } else {
-                            pila.apilar(n);
+                            pila.apilar(n); //si es DFS usamos pilas
                             size++;
                         }
                         
@@ -108,18 +150,18 @@ public class Search {
                 
                 separador = true; 
                 
-//                if (BFS){
-//                    System.out.println("COLA" + n.getValue() + "  ");
-//                } else {
-//                    System.out.println("PILA" + n.getValue() + "  ");
-//                }
                 
-                int id = (int) n.getValue(); //sacamos el id dentro del nodo del primero de la cola
+                int id = (int) n.getValue(); 
+                //sacamos el id dentro del nodo del primero de la cola
+                
+                
                 for (int i = 0; i < usersQuant; i++) {
-                    if (id == usuariosArray[i]){ //sacamos el index de ese id en la matriz
+                    if (id == usuariosArray[i]){ 
+                    //sacamos el index de ese id en la matriz
                         index = i;
 
-                        for (int j = 0; j < usersQuant; j++) { //buscamos en la matrix con qué conecta ese nodo
+                        for (int j = 0; j < usersQuant; j++) { 
+                        //buscamos en la matrix con qué conecta ese nodo
 
                             if (matrix[index][j] != null){
                                 if (!checked[j]){
@@ -193,6 +235,7 @@ public class Search {
                     JOptionPane.INFORMATION_MESSAGE);
 
             String[] islands = sb.toString().split("//");
+            
             for (int i = 0; i < islands.length; i++) {
                 if (BFS){
                     JOptionPane.showMessageDialog(null, 
@@ -210,23 +253,22 @@ public class Search {
         }
         
         islandSetter(islandCounter); 
-        //System.out.println("check" + islandQuant);
-        //this.islandCounter = islandCounter; 
-        //System.out.println("hoal" + islandQuant);
-        //System.out.println("hoal" + this.islandCounter);
         
     }
     
+    
+    /**Description: usado para la identificación de puentes, 
+     *      devuelve el conteo de islas después de un recorrido. 
+     * 
+     * @param islandCounter int de la cantidad de islas.
+     * 
+     * @return islandQuant int de la cantidad de islas.
+     */
     public static int islandSetter(int islandCounter){
         islandQuant = islandCounter; 
-        System.out.println("Probando IQ "+ islandQuant);
         return islandQuant; 
     }
     
-    //public int getIslandCounter(){
-        //islandCounter = this.islandCounter;
-        //System.out.println(islandCounter);
-        //return islandCounter;
-    //}
+
     
 }

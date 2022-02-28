@@ -9,7 +9,11 @@ import java.io.PrintWriter;
 import javax.swing.JOptionPane;
 
 /**
- *
+ * La clase Modify se ejecuta a partir del botón
+ * de Modificar Grafo, se encarga de toda la parte
+ * de restructurar la base de datos a partir de lo 
+ * que el usuario desee cambiar. 
+ * 
  * @author dario
  */
 public class Modify{
@@ -27,13 +31,40 @@ public class Modify{
      
     
     
-    
+    /**
+     * Modify es la que dirige toda la parte de modificar
+     * le pregunta al usuario qué desea modificar y si es
+     * añadir o eliminar y dirige el programa. Mediante 
+     * inputs determina qué desea el usuario y ejecuta las 
+     * funciones necesarias para ello. 
+     *
+     * @param usersArray arreglo de enteros solo con
+     *          los id de los usuarios
+     * 
+     * @param usersGuide mega string de la lista de usuarios
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @param path ruta del txt
+     * 
+     * @author Darío Aldana
+     */
     public Modify(int[] usersArray, String usersGuide, String relsGuide, String path){
         this.changeMade = false; 
+        /** changeMade es un booleano que determina si existió
+         * algún cambio en los usuarios y las relaciones para
+         * después ejecutar el cambio en la base de datos.
+         * 
+         */
+        
         this.usersArray = usersArray;
         this.size = usersArray.length;
-       
+
         
+        // Toda la siguiente parte es de determinar qué
+        //acción realizará el usuario. 
         int selection1 = JOptionPane.showOptionDialog(null, 
                         "Indique qué desea modificar", 
                         "Modificar Base de Datos", 
@@ -91,11 +122,24 @@ public class Modify{
         if (changeMade){
             rewriteDatabase(path, usersGuide, relsGuide);
         }
-        
-        
-        
     }
     
+    
+    
+    
+    /**
+     * addUser permite añadir un usuario, recibe el mega string
+     * de los usuarios y formula un nuevo usuario para luego 
+     * concatenarlo con el string. El ID del usuario sólo puede
+     * tener tres dígitos y el usuario debe empezar por "@"
+     * 
+     * @param usersGuide mega txt de la lista de usuarios
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @author Darío Aldana
+     * 
+     * @return usersGuide el mismo param pero editado
+     */
     public String addUser(String usersGuide){
         while (true) {
             try {
@@ -177,13 +221,31 @@ public class Modify{
        
         String userToAdd = idStr + ", " + user + "//";
         usersGuide = usersGuide.concat(userToAdd);
-        System.out.println(userToAdd);
-        System.out.println(usersGuide);
         
         this.changeMade = true; 
         return usersGuide;
        }
     
+    /**
+     * popUser permite borrar un usuario por su ID
+     * tiene un ciclo for donde se copia el array de usuarios
+     * (lleno de enteros que corresponden a los IDs)
+     * pero con una longitud disminuida en uno, de manera que
+     * se copien todos los usuarios menos el que se busca 
+     * eliminar y esa versión final es la que se convierte
+     * en string de nuevo para posteriormente modificar la 
+     * base de datos
+     * 
+     * @param usersGuide mega string de la lista de usuarios
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @author Darío Aldana
+     * 
+     * @return usersGuide string actualizado
+     */
     public String popUser(String usersGuide, String relsGuide){
         boolean breakWhile = false; 
         while (true) {
@@ -264,6 +326,20 @@ public class Modify{
         return usersGuide;
     }
     
+    /**
+     * popUsersRels borra las relaciones hechas por un usuario
+     * que va a ser eliminado, a modo de que en el grafo no 
+     * queden aristas sueltos, pues no se puede tener una relación
+     * con un usuario eliminado.
+     *
+
+     * @param idStr id del usuario que se desea eliminar
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @return relsGuide string de relaciones actualizado
+     */
     public String popUsersRels(String idStr, String relsGuide){
         
         int counter = 0;
@@ -275,7 +351,13 @@ public class Modify{
             }
         }
         int[] indexs = new int[counter];
-        
+        /**
+         * int counter permite saber cuántas relaciones
+         * tenía el usuario que vamos a eliminar, ese valor será
+         * la longitud de un arreglo de enteros llamado indexs, que
+         * almacenará los índices de las relaciones a eliminar en 
+         * el arreglo de relaciones relsGuideArray
+         */
         
         int k = 0; 
         for (int i = 0; i < relsGuideArray.length; i++) {
@@ -291,6 +373,13 @@ public class Modify{
         
         String[] relsGuideArrayFinal = new String[relsGuideArray.length-counter];
         
+        /**
+         * Aquí se procede a eliminar varios elementos de un array. 
+         * Básicamente se hace un array de una longitud menor y se
+         * pasan todos los elementos en el orden correcto pero saltando
+         * al que se va a eliminar. Como pueden ser varios elementos, 
+         * se hace un ciclo for y el proceso está en la siguiente función 
+         */
         
         int deleted = 0;
         for (int i = 0; i < indexs.length; i++) {
@@ -309,8 +398,25 @@ public class Modify{
         return relsGuide;
     }
     
+    
+    /**
+     * removeRel maneja dos variables de iteración, i y j.
+     * Se recorrerá el array copiando todos los elementos
+     * hasta que el booleano "popped" indique que ya nos saltamos
+     * el elemento que queríamos eliminar, de esa manera, ya
+     * vamos agregando a los elementos en el array nuevo en una 
+     * posición menor a la que están en el array original
+     * 
+     * @param index índice de la relación a eliminar en el array de
+     *          relaciones
+     * @param relsGuideArray array [strings] de relaciones 
+     * 
+     * @author Dario Aldana
+     * 
+     * @return relsGuideArrayFinal relsGuideArray actualizado
+     */
     public String[] removeRel(int index, String[] relsGuideArray){
-        System.out.println("INDICE  "+ index);
+        
         boolean popped = false;
         String[] relsGuideArrayFinal = new String[relsGuideArray.length-1];
         int j= 0; 
@@ -331,6 +437,20 @@ public class Modify{
         return relsGuideArrayFinal;
     }
     
+    
+    
+    
+    /** addRel permite añadir una relacion, recibe el mega string
+     * de las relaciones y formula una nueva pidiendo ambos id
+     * y el tiempo. Luego lo concatena con el string recibido
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @author Darío Aldana
+
+     * @return relsGuide actualizado. 
+     */
     public String addRel(String relsGuide){
         
         String[] relsGuideArray = relsGuide.split("//");
@@ -416,16 +536,28 @@ public class Modify{
                 }
         }
         
-        System.out.println(relsGuide);
+        
         String relToAdd = id1Str + ", " + id2Str + ", " + timeStr + "//"; 
-        System.out.println(relToAdd);
+        
         relsGuide = relsGuide.concat(relToAdd);
-        System.out.println(relsGuide);
+        
         
         this.changeMade = true; 
         return relsGuide; 
     }
     
+    
+    
+    
+    /**popRel borra una relación habiendo recibido ambos ID
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @author Darío Aldana
+
+     * @return relsGuide actualizado. 
+     */
     public String popRel(String relsGuide){
         String[] relsGuideArray = relsGuide.split("//");
         String[] relsGuideArrayFinal = new String[relsGuideArray.length-1];
@@ -492,12 +624,15 @@ public class Modify{
         }
         
         
-        System.out.println(id1Str);
-        System.out.println(id2Str);
-        System.out.println(index);
-        
         boolean popped = false; 
         int j = 0; 
+        
+        /**
+         * El siguiente algoritmo permite borrar la relación 
+         * creando otro array de menor longitud y copiando 
+         * todos los elementos de uno en otro menos el que se 
+         * desea eliminar. 
+         */
         
         for (int i = 0; i < relsGuideArray.length; i++) {
            if (i == index){
@@ -525,6 +660,23 @@ public class Modify{
         return relsGuide;
     }
   
+    
+    /**rewriteDatabase es el fin de toda la clase Modify
+     * sea el camino que se escoja, si se realizó algún cambio
+     * esta función lo pasará a la base de datos. 
+     * 
+     * @param usersGuide mega string de la lista de usuarios
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @param relsGuide mega string de la lista de relaciones
+     *          cuyo separador entre líneas es "//"
+     * 
+     * @param path ruta del txt
+     * 
+     * @author Dario Aldana
+     */
+    
+    
     public void rewriteDatabase(String path, String usersGuide, String relsGuide){
         
         String[] usersGuideArray = usersGuide.split("//");
